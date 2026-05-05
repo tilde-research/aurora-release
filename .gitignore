@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+build/
+dist/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Demo artifacts
+data/
+results/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Linter caches
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
