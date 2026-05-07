@@ -1,7 +1,6 @@
 # Aurora
 
-Aurora is an optimizer for non-square matrices that achieves more effective utilization of MLP neurons. It modifies Muon's update for non-square weight matrices: instead of `polar(G)`,
-which inherits non-uniform left-singular row norms, Aurora iteratively approximates a projection onto the intersection of the row oblique and Steifel manifolds, giving more uniform updates without sacrificing polar factor precision. For square matrices Aurora reduces to the standard Muon update.
+Aurora is an optimizer for non-square matrices that achieves more effective utilization of MLP neurons. Instead of `polar(G)`, which inherits non-uniform left-singular row norms, Aurora iteratively approximates a projection onto the intersection of the row oblique and Steifel manifolds, giving more balanced updates without sacrificing polar factor precision. For square matrices Aurora reduces to the standard Muon update.
 
 ### Code structure
 
