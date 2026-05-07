@@ -1,7 +1,7 @@
-"""Matrix sign function (polar factor) via simple-quintic Newton-Schulz.
+"""Polar factor via simple-quintic Newton-Schulz.
 
-For a matrix G with SVD G = U Σ V^T, this returns U V^T (the polar factor /
-matrix sign of G). All non-zero singular values are mapped to 1.
+For a matrix G with SVD G = U Σ V^T, this returns U V^T (the polar factor
+of G). All non-zero singular values are mapped to 1.
 
 Implementation: 12 iterations of the simple-quintic polynomial
     p(σ) = 2σ - 1.5σ³ + 0.5σ⁵
@@ -12,15 +12,15 @@ singular values in (0, √2) are driven to 1 to bf16 precision.
 This is the polar method used by the Modded-NanoGPT track-3 baseline at
 https://github.com/KellerJordan/modded-nanogpt/blob/master/records/track_3_optimization/train_gpt_simple.py
 "not optimizing for wallclock speed". We match it byte-for-byte so that
-optimizers built on this `msign` reproduce leaderboard val_loss curves.
+optimizers built on this `polar` reproduce leaderboard val_loss curves.
 """
 
 import torch
 
 
 @torch.no_grad()
-def msign(G: torch.Tensor) -> torch.Tensor:
-    """Matrix sign / polar factor via 12-step simple-quintic Newton-Schulz.
+def polar(G: torch.Tensor) -> torch.Tensor:
+    """Polar factor via 12-step simple-quintic Newton-Schulz.
 
     Args:
         G: input matrix of shape [..., m, n].

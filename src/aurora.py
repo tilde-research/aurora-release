@@ -1,6 +1,6 @@
 import torch
 
-from msign import msign
+from polar import polar
 
 
 @torch.no_grad()
@@ -23,7 +23,7 @@ def aurora(
     m, n = update.size(-2), update.size(-1)
     if m == n:
         # Square: standard polar (no leverage freedom to exploit).
-        update = msign(update)
+        update = polar(update)
     else:
         # For wide G, transpose to tall, apply, transpose back.
         # polar(G * D) = polar(D * G^T)^T
@@ -36,7 +36,7 @@ def aurora(
         row_norm = G32.norm(dim=-1, keepdim=True).clamp_(min=eps)
         D = 1.0 / row_norm
         for k in range(pp_iterations):
-            U = msign(D * G32)
+            U = polar(D * G32)
             if k < pp_iterations - 1:
                 row_sq = U.to(torch.float32).pow(2).sum(dim=-1, keepdim=True).clamp_(min=eps * eps)
                 D = D * (target_row_sq / row_sq).pow(pp_beta)

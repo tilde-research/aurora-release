@@ -1,7 +1,7 @@
 import math
 import torch
 
-from msign import msign
+from polar import polar
 
 
 @torch.no_grad()
@@ -78,7 +78,7 @@ def _riemannian_balanced_polar(
     target_row_norm = math.sqrt(r)
 
     # Initial point: Muon/polar update.
-    U = msign(G32)
+    U = polar(G32)
 
     for _ in range(outer_steps):
         # Stiefel correction.
@@ -107,7 +107,7 @@ def _riemannian_balanced_polar(
         for _ in range(retraction_steps):
             row_norm = Y.norm(dim=-1, keepdim=True).clamp_min(eps)
             Y = Y * (target_row_norm / row_norm)
-            Y = msign(Y)
+            Y = polar(Y)
 
         U = Y
 
@@ -137,7 +137,7 @@ def riemannian_aurora(
     m, n = update.size(-2), update.size(-1)
     if m == n:
         # Square: no leverage freedom to exploit.
-        update = msign(update)
+        update = polar(update)
     else:
         update = _riemannian_balanced_polar(
             update,
