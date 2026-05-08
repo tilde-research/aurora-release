@@ -2,6 +2,9 @@
 
 Aurora is an optimizer for non-square matrices that achieves more effective utilization of MLP neurons. Instead of `polar(G)`, which inherits non-uniform left-singular row norms, Aurora iteratively approximates a projection onto the intersection of the row oblique and Steifel manifolds, giving more balanced updates without sacrificing polar factor precision. For square matrices Aurora reduces to the standard Muon update.
 
+See the blog for more information:
+https://blog.tilderesearch.com/blog/aurora
+
 ### Code structure
 
 ```text
