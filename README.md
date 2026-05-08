@@ -5,6 +5,9 @@ Aurora is an optimizer for non-square matrices that achieves more effective util
 See the blog for more information:
 https://blog.tilderesearch.com/blog/aurora
 
+And Twitter at:
+https://x.com/tilderesearch/status/2052798181558370419
+
 ### Code structure
 
 ```text
