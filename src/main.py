@@ -8,6 +8,7 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 from aurora import aurora
+from riemannian_aurora import riemannian_aurora
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
 
@@ -46,7 +47,7 @@ def train(epochs, initial_lr, update, wd):
         optimizer = AdamW(model.parameters(), lr=initial_lr, weight_decay=wd)
         momenta = None
     else:
-        assert update == aurora
+        assert update in (aurora, riemannian_aurora)
         optimizer = None
         # Aurora needs per-parameter momentum buffers (caller-managed).
         momenta = [torch.zeros_like(p) for p in model.parameters()]
@@ -131,7 +132,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a model on CIFAR-10.")
     parser.add_argument("--epochs", type=int, default=5, help="Number of epochs to train for.")
     parser.add_argument("--lr", type=float, default=0.05, help="Initial learning rate.")
-    parser.add_argument("--update", type=str, default="aurora", choices=["aurora", "adam"], help="Update rule to use.")
+    parser.add_argument("--update", type=str, default="aurora", choices=["aurora", "riemannian_aurora", "adam"], help="Update rule to use.")
     parser.add_argument("--seed", type=int, default=42, help="Seed for the random number generator.")
     parser.add_argument("--wd", type=float, default=0.025, help="Weight decay.")
     args = parser.parse_args()
@@ -142,7 +143,7 @@ if __name__ == "__main__":
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-    update_rules = {"aurora": aurora, "adam": AdamW}
+    update_rules = {"aurora": aurora, "riemannian_aurora": riemannian_aurora, "adam": AdamW}
     update = update_rules[args.update]
 
     print(f"Training with: {args.update}")
