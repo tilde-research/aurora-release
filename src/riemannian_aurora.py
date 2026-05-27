@@ -78,7 +78,7 @@ def _riemannian_balanced_polar(
     target_row_norm = math.sqrt(r)
 
     # Initial point: Muon/polar update.
-    U = polar(G32)
+    U = polar(G32).to(torch.float32)
 
     for _ in range(outer_steps):
         # Stiefel correction.
@@ -107,7 +107,7 @@ def _riemannian_balanced_polar(
         for _ in range(retraction_steps):
             row_norm = Y.norm(dim=-1, keepdim=True).clamp_min(eps)
             Y = Y * (target_row_norm / row_norm)
-            Y = polar(Y)
+            Y = polar(Y).to(torch.float32)
 
         U = Y
 
