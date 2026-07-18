@@ -39,16 +39,10 @@ def aurora(
     update = G.lerp_(momentum, mu) if nesterov else momentum.clone()
     # Aurora's leverage-uniform polar via diagonal preconditioning.
     m, n = update.size(-2), update.size(-1)
-    if m == n:
-        # Square: standard polar (no leverage freedom to exploit).
+    if m <= n:
+        # Square/wide: standard Muon
         update = polar(update)
     else:
-        # For wide G, transpose to tall, apply, transpose back.
-        # polar(G * D) = polar(D * G^T)^T
-        transposed = m < n
-        if transposed:
-            update = update.mT
-            m, n = n, m
         G32 = update.to(torch.float32)
         target_row_sq = n / m
         row_norm = G32.norm(dim=-1, keepdim=True).clamp_(min=eps)
@@ -58,7 +52,7 @@ def aurora(
             if k < pp_iterations - 1:
                 row_sq = U.to(torch.float32).pow(2).sum(dim=-1, keepdim=True).clamp_(min=eps * eps)
                 D = D * (target_row_sq / row_sq).pow(pp_beta)
-        update = U.mT if transposed else U
+        update = U
     # Spectral aspect-ratio scaling (Muon convention).
     update *= max(1, G.size(-2) / G.size(-1)) ** 0.5
     if not update.isfinite().all():

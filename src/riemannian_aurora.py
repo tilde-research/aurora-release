@@ -135,8 +135,8 @@ def riemannian_aurora(
 
     # Riemannian-Aurora balanced polar update.
     m, n = update.size(-2), update.size(-1)
-    if m == n:
-        # Square: no leverage freedom to exploit.
+    if m <= n:
+        # Square/wide: standard Muon.
         update = polar(update)
     else:
         update = _riemannian_balanced_polar(

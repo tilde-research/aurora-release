@@ -5,6 +5,7 @@ import time
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
 from aurora import aurora
@@ -27,16 +28,19 @@ test_loader = DataLoader(dataset=test_dataset, batch_size=1024, shuffle=False)
 class MLP(nn.Module):
     def __init__(self):
         super(MLP, self).__init__()
-        self.fc1 = nn.Linear(32 * 32 * 3, 128, bias=False)
-        self.fc2 = nn.Linear(128, 64, bias=False)
-        self.fc3 = nn.Linear(64, 10, bias=False)
+        hidden_dim = 128
+        intermediate_dim = 256
+        self.input_proj = nn.Linear(32 * 32 * 3, hidden_dim, bias=False)
+        self.gate_proj = nn.Linear(hidden_dim, intermediate_dim, bias=False)
+        self.up_proj = nn.Linear(hidden_dim, intermediate_dim, bias=False)
+        self.down_proj = nn.Linear(intermediate_dim, hidden_dim, bias=False)
+        self.classifier = nn.Linear(hidden_dim, 10, bias=False)
 
     def forward(self, x):
         x = x.view(-1, 32 * 32 * 3)
-        x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
+        x = self.input_proj(x)
+        x = x + self.down_proj(F.silu(self.gate_proj(x)) * self.up_proj(x))
+        return self.classifier(x)
 
 
 def train(epochs, initial_lr, update, wd):
