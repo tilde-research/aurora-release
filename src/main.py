@@ -13,6 +13,9 @@ from riemannian_aurora import riemannian_aurora
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
 
+# Adam requires a less aggressive lr than Aurora
+ADAM_LR = 0.001
+
 transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.49139968, 0.48215827, 0.44653124), (0.24703233, 0.24348505, 0.26158768))
@@ -48,6 +51,7 @@ def train(epochs, initial_lr, update, wd):
     criterion = nn.CrossEntropyLoss()
 
     if update == AdamW:
+        initial_lr = ADAM_LR
         optimizer = AdamW(model.parameters(), lr=initial_lr, weight_decay=wd)
         momenta = None
     else:
@@ -135,7 +139,12 @@ def weight_stats(model):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a model on CIFAR-10.")
     parser.add_argument("--epochs", type=int, default=5, help="Number of epochs to train for.")
-    parser.add_argument("--lr", type=float, default=0.05, help="Initial learning rate.")
+    parser.add_argument(
+        "--lr",
+        type=float,
+        default=0.05,
+        help=f"Initial learning rate for Aurora variants; AdamW is fixed at {ADAM_LR}.",
+    )
     parser.add_argument("--update", type=str, default="aurora", choices=["aurora", "riemannian_aurora", "adam"], help="Update rule to use.")
     parser.add_argument("--seed", type=int, default=42, help="Seed for the random number generator.")
     parser.add_argument("--wd", type=float, default=0.025, help="Weight decay.")
@@ -149,6 +158,8 @@ if __name__ == "__main__":
 
     update_rules = {"aurora": aurora, "riemannian_aurora": riemannian_aurora, "adam": AdamW}
     update = update_rules[args.update]
+    if update == AdamW:
+        args.lr = ADAM_LR
 
     print(f"Training with: {args.update}")
     print(f"Epochs: {args.epochs} --- LR: {args.lr} --- WD: {args.wd}")
